@@ -1,6 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  darkMode: ["class"], // CRITICAL
+  darkMode: ["class"],
   content: [
     "./pages/**/*.{ts,tsx}",
     "./components/**/*.{ts,tsx}",
@@ -22,8 +22,8 @@ module.exports = {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
-        background: "hsl(var(--background))", // Should be defined in globals.css
-        foreground: "hsl(var(--foreground))", // Should be defined in globals.css
+        background: "hsl(var(--background))",
+        foreground: "hsl(var(--foreground))",
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
@@ -33,7 +33,7 @@ module.exports = {
           foreground: "hsl(var(--secondary-foreground))",
         },
         destructive: {
-          DEFAULT: "hsl(var(--destructive))",
+          DEFAULT: "hsl(var(--destructive))", // Can be overridden by custom-error
           foreground: "hsl(var(--destructive-foreground))",
         },
         muted: {
@@ -54,18 +54,29 @@ module.exports = {
         },
         "custom-green-icon-bg": "#38A169",
         "custom-green-active-bg": "#E0F2E0",
-        "custom-green-button-bg": "#7FD1A0",
-        "custom-sidebar-bg": "#F8FAFC",
+
+        "custom-button-primary": "#66CE93",
+        "custom-button-primary-hover": "#3DBD74", // A slightly darker shade for hover
+        "custom-status-success": "#22C55E",
+        "custom-status-success-bg": "#CBF6DB", // Light bg for success status text
+        "custom-status-error": "#EF4444",
+        "custom-status-error-bg": "#FCDEDE", // Light bg for error status text
+
+        "custom-sidebar-bg": "#F7F7F7", // Sidebar specific bg
+
         // Dark theme specific colors
         "dark-sidebar-bg": "#1F2937",
+        "dark-header-bg": "#1F2937",
+        "dark-header-border": "#374151",
         "dark-sidebar-foreground": "#D1D5DB",
         "dark-sidebar-muted-foreground": "#9CA3AF",
-        "dark-active-bg": "#2F855A",
+        "dark-active-bg": "#2F855A", // Dark active for sidebar
         "dark-hover-bg": "#374151",
         "dark-card-bg": "#111827",
-        "dark-button-bg": "#48BB78",
+        "dark-button-bg": "#48BB78", // Can be overridden by custom-button-primary for dark if needed
         "dark-button-text": "#1F2937",
         "dark-border": "#374151",
+        "dark-background": "#030712", // Dark main background (e.g. gray-950)
       },
       borderRadius: {
         lg: "var(--radius)",
