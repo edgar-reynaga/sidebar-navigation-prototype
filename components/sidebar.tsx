@@ -99,12 +99,12 @@ const projectItems = [
 ]
 
 const managerItems = [
-  { href: "#", icon: faGlobe, label: "Domain Manager" },
-  { href: "#", icon: faUserGear, label: "User Manager" },
   { href: "#", icon: faEnvelope, label: "Message Manager" },
   { href: "#", icon: faPenToSquare, label: "Presentation Manager" },
   { href: "#", icon: faFileInvoiceDollar, label: "Payment Manager" },
+  { href: "#", icon: faGlobe, label: "Domain Manager" },
   { href: "#", icon: faPersonToPortal, label: "Customer Portal Manager" },
+  { href: "#", icon: faUserGear, label: "User Manager" },
 ]
 
 const integrationItemsData = [
