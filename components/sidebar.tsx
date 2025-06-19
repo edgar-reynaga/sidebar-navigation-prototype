@@ -110,13 +110,14 @@ const managerItems = [
 const integrationItemsData = [
   { href: "#", icon: faStripeS, label: "Stripe" },
   { href: "#", icon: faCircleStop, label: "Tessitura" },
-  { href: "#", icon: faCircleStop, label: "Brightcove Gallery" },
-  { href: "#", icon: faCircleStop, label: "Brightcove Beacon" },
   { href: "#", icon: faCircleStop, label: "Prospect2" },
+  { href: "#", icon: faCircleStop, label: "Double the Donation" },
   { href: "#", icon: faGoogle, label: "Google" },
-  { href: "#", icon: faVimeoV, label: "Vimeo" },
   { href: "#", icon: faCircleStop, label: "Twilio" },
   { href: "#", icon: faQrcode, label: "QR Code" },
+  { href: "#", icon: faCircleStop, label: "Brightcove Gallery" },
+  { href: "#", icon: faCircleStop, label: "Brightcove Beacon" },
+  { href: "#", icon: faVimeoV, label: "Vimeo" }
 ]
 
 export default function Sidebar() {
