@@ -3,10 +3,12 @@
 import type React from "react"
 import { useState, useEffect } from "react"
 import Link from "next/link"
+import { usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { cn } from "@/lib/utils"
 import { ChatPopup } from "./chat-popup"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 
@@ -20,6 +22,7 @@ import {
   faChevronLeft,
   faChevronRight,
   faUserGear,
+  faFileAlt,
   faGrid2,
   faRectangleHistory,
   faMemo,
@@ -35,29 +38,30 @@ interface NavItemProps {
   href: string
   icon: any
   label: string
-  active?: boolean
   isCollapsed: boolean
 }
 
-const NavItem: React.FC<NavItemProps> = ({ href, icon, label, active, isCollapsed }) => {
-  return (
+const NavItem: React.FC<NavItemProps> = ({ href, icon, label, isCollapsed }) => {
+  const pathname = usePathname()
+  const isActive = pathname === href
+
+  const linkContent = (
     <Link
       href={href}
       className={cn(
         "flex items-center space-x-3 px-3 py-2.5 rounded-md text-sm font-medium group",
         "transition-colors duration-150",
-        active
+        isActive
           ? "bg-custom-green-active-bg text-slate-800 dark:bg-dark-active-bg dark:text-white"
           : "text-slate-700 hover:bg-slate-100 hover:text-slate-900 dark:text-dark-sidebar-foreground dark:hover:bg-dark-hover-bg dark:hover:text-white",
         isCollapsed && "justify-center px-0", // Center icon when collapsed
       )}
-      title={isCollapsed ? label : undefined}
     >
       <FontAwesomeIcon
         icon={icon}
         className={cn(
           "h-5 w-5 shrink-0",
-          active
+          isActive
             ? "text-slate-700 dark:text-white"
             : "text-slate-500 dark:text-dark-sidebar-muted-foreground group-hover:text-slate-700 dark:group-hover:text-white",
         )}
@@ -65,12 +69,26 @@ const NavItem: React.FC<NavItemProps> = ({ href, icon, label, active, isCollapse
       {!isCollapsed && <span className="whitespace-nowrap overflow-hidden">{label}</span>}
     </Link>
   )
+
+  if (isCollapsed) {
+    return (
+      <Tooltip delayDuration={300}>
+        <TooltipTrigger asChild>{linkContent}</TooltipTrigger>
+        <TooltipContent side="right" className="ml-1">
+          <p>{label}</p>
+        </TooltipContent>
+      </Tooltip>
+    )
+  }
+
+  return linkContent
 }
 
 const pagesItems = [
-  { href: "#", icon: faGrid2, label: "Dashboard", active: true },
-  { href: "#", icon: faChartSimple, label: "Reporting" },
+  { href: "/", icon: faGrid2, label: "Dashboard", active: true },
+  { href: "/reporting", icon: faChartSimple, label: "Reporting" },
   { href: "#", icon: faMobileNotch, label: "Forms" },
+  { href: "#", icon: faFileAlt, label: "Templates" },
   { href: "#", icon: faUserGroup, label: "Team Fundraising" },
 ]
 
@@ -100,28 +118,21 @@ const integrationItemsData = [
   { href: "#", icon: faCircleStop, label: "Twilio" },
   { href: "#", icon: faQrcode, label: "QR Code" },
 ]
-const INITIAL_INTEGRATIONS_VISIBLE = 5
 
 export default function Sidebar() {
   const [isCollapsed, setIsCollapsed] = useState(false)
-  const [openSections, setOpenSections] = useState<string[]>(["pages"]) // Persists user's accordion selection
-  const [showAllIntegrations, setShowAllIntegrations] = useState(false)
+  const [openSections, setOpenSections] = useState<string[]>([])
   const [isChatOpen, setIsChatOpen] = useState(false)
 
   useEffect(() => {
-    if (isCollapsed) {
-      setShowAllIntegrations(false) // Reset "Show More" for integrations list
-    }
-    // No direct manipulation of openSections here to preserve its state.
   }, [isCollapsed])
 
   const toggleSidebar = () => setIsCollapsed(!isCollapsed)
 
-  // Helper to render a section for the expanded Accordion view
   const renderAccordionSection = (
     title: string,
     sectionKey: string,
-    items: Array<Omit<NavItemProps, "isCollapsed" | "active"> & { active?: boolean }>,
+    items: Array<Omit<NavItemProps, "isCollapsed">>,
   ) => (
     <AccordionItem value={sectionKey} className="border-none">
       <AccordionTrigger className="px-3 py-2 text-xs font-semibold text-slate-500 dark:text-dark-sidebar-muted-foreground uppercase tracking-wider hover:no-underline hover:bg-slate-100 dark:hover:bg-dark-hover-bg rounded-md group">
@@ -132,18 +143,14 @@ export default function Sidebar() {
       <AccordionContent className="pt-1">
         <nav className="space-y-1">
           {items.map((item) => (
-            <NavItem key={item.label} {...item} isCollapsed={false} active={item.active} />
+            <NavItem key={item.label} {...item} isCollapsed={false} />
           ))}
         </nav>
       </AccordionContent>
     </AccordionItem>
   )
 
-  // Helper to render integrations section for the expanded Accordion view
   const renderAccordionIntegrationsSection = () => {
-    const itemsToDisplay = showAllIntegrations
-      ? integrationItemsData
-      : integrationItemsData.slice(0, INITIAL_INTEGRATIONS_VISIBLE)
     return (
       <AccordionItem value="integrations" className="border-none">
         <AccordionTrigger className="px-3 py-2 text-xs font-semibold text-slate-500 dark:text-dark-sidebar-muted-foreground uppercase tracking-wider hover:no-underline hover:bg-slate-100 dark:hover:bg-dark-hover-bg rounded-md group">
@@ -153,36 +160,24 @@ export default function Sidebar() {
         </AccordionTrigger>
         <AccordionContent className="pt-1">
           <nav className="space-y-1">
-            {itemsToDisplay.map((item) => (
+            {integrationItemsData.map((item) => (
               <NavItem key={item.label} {...item} isCollapsed={false} />
             ))}
-            {integrationItemsData.length > INITIAL_INTEGRATIONS_VISIBLE && (
-              <Button
-                variant="link"
-                className="w-full justify-start px-3 py-2 text-sm text-custom-button-primary hover:text-custom-button-primary-hover dark:text-custom-button-primary dark:hover:text-custom-button-primary-hover/80"
-                onClick={() => setShowAllIntegrations(!showAllIntegrations)}
-              >
-                {showAllIntegrations
-                  ? "Show Less"
-                  : `Show More (${integrationItemsData.length - INITIAL_INTEGRATIONS_VISIBLE})`}
-              </Button>
-            )}
           </nav>
         </AccordionContent>
       </AccordionItem>
     )
   }
 
-  const hasOpenSectionsOtherThanPages = openSections.some(
+  const hasOpenSections = openSections.some(
     (sec) =>
-      sec !== "pages" &&
-      ((sec === "projects" && projectItems.length > 0) ||
-        (sec === "managers" && managerItems.length > 0) ||
-        (sec === "integrations" && integrationItemsData.length > 0)),
+      (sec === "projects" && projectItems.length > 0) ||
+      (sec === "managers" && managerItems.length > 0) ||
+      (sec === "integrations" && integrationItemsData.length > 0),
   )
 
   return (
-    <>
+    <TooltipProvider>
       <div
         className={cn(
           "relative flex flex-col h-full bg-custom-sidebar-bg dark:bg-dark-sidebar-bg border-r border-slate-200 dark:border-dark-border transition-all duration-300 ease-in-out",
@@ -206,18 +201,13 @@ export default function Sidebar() {
           {isCollapsed ? (
             // Collapsed View: Render icons directly
             <div className="space-y-0.5 p-4 pt-8">
-              {/* Pages Section Icons (Always Visible) */}
+              {/* Always Visible Pages Items */}
               {pagesItems.map((item) => (
-                <NavItem
-                  key={`collapsed-${item.label}`}
-                  {...item}
-                  isCollapsed={true}
-                  active={!!item.active && openSections.includes("pages")}
-                />
+                <NavItem key={`collapsed-${item.label}`} {...item} isCollapsed={true} />
               ))}
 
-              {/* Separator if Pages icons are shown and other open sections follow */}
-              {pagesItems.length > 0 && hasOpenSectionsOtherThanPages && (
+              {/* Separator if there are open accordion sections */}
+              {hasOpenSections && (
                 <div className="py-1.5">
                   <hr className="border-slate-200 dark:border-dark-border/50 mx-2" />
                 </div>
@@ -225,14 +215,7 @@ export default function Sidebar() {
 
               {/* Projects Section Icons (If Open) */}
               {openSections.includes("projects") &&
-                projectItems.map((item) => (
-                  <NavItem
-                    key={`collapsed-${item.label}`}
-                    {...item}
-                    isCollapsed={true}
-                    active={!!item.active && openSections.includes("projects")}
-                  />
-                ))}
+                projectItems.map((item) => <NavItem key={`collapsed-${item.label}`} {...item} isCollapsed={true} />)}
 
               {/* Separator if Projects icons are shown and other open sections follow */}
               {openSections.includes("projects") &&
@@ -245,14 +228,7 @@ export default function Sidebar() {
 
               {/* Managers Section Icons (If Open) */}
               {openSections.includes("managers") &&
-                managerItems.map((item) => (
-                  <NavItem
-                    key={`collapsed-${item.label}`}
-                    {...item}
-                    isCollapsed={true}
-                    active={!!item.active && openSections.includes("managers")}
-                  />
-                ))}
+                managerItems.map((item) => <NavItem key={`collapsed-${item.label}`} {...item} isCollapsed={true} />)}
 
               {/* Separator if Managers icons are shown and Integrations icons follow */}
               {openSections.includes("managers") &&
@@ -266,25 +242,26 @@ export default function Sidebar() {
               {/* Integrations Section Icons (If Open) */}
               {openSections.includes("integrations") &&
                 integrationItemsData.map((item) => (
-                  <NavItem
-                    key={`collapsed-${item.label}`}
-                    {...item}
-                    isCollapsed={true}
-                    // Assuming integration items don't have an 'active' state like pages
-                    active={false}
-                  />
+                  <NavItem key={`collapsed-${item.label}`} {...item} isCollapsed={true} />
                 ))}
             </div>
           ) : (
-            // Expanded View: Render Accordion
+            // Expanded View: Always visible pages + Accordion for other sections
             <div className="p-4 pt-8 space-y-1">
+              {/* Always Visible Pages Navigation */}
+              <nav className="space-y-1 mb-4">
+                {pagesItems.map((item) => (
+                  <NavItem key={item.label} {...item} isCollapsed={false} />
+                ))}
+              </nav>
+
+              {/* Accordion for collapsible sections */}
               <Accordion
                 type="multiple"
                 className="w-full space-y-1"
                 value={openSections}
                 onValueChange={setOpenSections}
               >
-                {renderAccordionSection("Pages", "pages", pagesItems)}
                 {renderAccordionSection("Projects", "projects", projectItems)}
                 {renderAccordionSection("Managers", "managers", managerItems)}
                 {renderAccordionIntegrationsSection()}
@@ -340,6 +317,6 @@ export default function Sidebar() {
         </div>
       </div>
       <ChatPopup isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} />
-    </>
+    </TooltipProvider>
   )
 }

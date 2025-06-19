@@ -7,18 +7,13 @@ import { useTheme } from "next-themes"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import {
   faSearch,
-  faBell,
   faGear,
-  faUserCircle,
-  faSun,
   faMoon,
   faCreditCard,
-  faFileInvoiceDollar,
   faSignOutAlt,
   faFileAlt,
   faBook,
   faProjectDiagram,
-  faTimes,
 } from "@fortawesome/free-solid-svg-icons"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -31,15 +26,8 @@ import {
   DropdownMenuTrigger,
   DropdownMenuGroup,
 } from "@/components/ui/dropdown-menu"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { cn } from "@/lib/utils"
 import { faBrightness, faLayerGroup, faUser } from "@fortawesome/pro-solid-svg-icons"
-
-const initialNotifications = [
-  { id: "n1", title: "New feature released!", time: "2m ago", read: false },
-  { id: "n3", title: "Welcome to the platform!", time: "1d ago", read: true },
-  { id: "n4", title: "Maintenance scheduled for tonight.", time: "3h ago", read: false },
-]
 
 const mockSearchResults = {
   topMatches: [
@@ -75,7 +63,6 @@ export function AppHeader() {
   const { theme, setTheme, resolvedTheme } = useTheme()
   const [searchQuery, setSearchQuery] = useState("")
   const [showSearchResults, setShowSearchResults] = useState(false)
-  const [notifications, setNotifications] = useState(initialNotifications)
 
   useEffect(() => setIsMounted(true), [])
 
@@ -96,16 +83,6 @@ export function AppHeader() {
       setShowSearchResults(true)
     }
   }
-
-  const dismissNotification = (notificationId: string) => {
-    setNotifications((prev) => prev.filter((n) => n.id !== notificationId))
-  }
-
-  const markAsRead = (notificationId: string) => {
-    setNotifications((prev) => prev.map((n) => (n.id === notificationId ? { ...n, read: true } : n)))
-  }
-
-  const unreadNotificationCount = notifications.filter((n) => !n.read).length
 
   const SearchResultItem: React.FC<{ item: (typeof mockSearchResults.topMatches)[0] }> = ({ item }) => (
     <Link
@@ -198,65 +175,6 @@ export function AppHeader() {
             <FontAwesomeIcon icon={currentDisplayTheme === "dark" ? faBrightness : faMoon} className="h-5 w-5" />
           </Button>
         )}
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button
-              variant="ghost"
-              size="icon"
-              aria-label="Notifications"
-              className="relative text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-dark-hover-bg rounded-md"
-            >
-              <FontAwesomeIcon icon={faBell} className="h-5 w-5" />
-              {unreadNotificationCount > 0 && (
-                <span className="absolute top-1.5 right-1.5 flex h-2 w-2 rounded-full bg-red-600"></span>
-              )}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-80 p-0 dark:bg-dark-card-bg dark:border-dark-border" align="end">
-            <div className="p-3 font-semibold border-b dark:border-dark-border text-sm flex justify-between items-center">
-              <span>Notifications</span>
-              {notifications.length > 0 && (
-                <Button variant="link" size="sm" className="p-0 h-auto text-xs" onClick={() => setNotifications([])}>
-                  Clear all
-                </Button>
-              )}
-            </div>
-            <div className="max-h-80 overflow-y-auto custom-scrollbar">
-              {notifications.length > 0 ? (
-                notifications.map((notif) => (
-                  <div key={notif.id} className={cn("p-3 border-b dark:border-dark-border/50 last:border-b-0 group")}>
-                    <div className="flex justify-between items-start">
-                      <div className="flex-1 pr-2 cursor-pointer" onClick={() => markAsRead(notif.id)}>
-                        <p className="text-sm font-medium">{notif.title}</p>
-                        <p className="text-xs text-muted-foreground">{notif.time}</p>
-                      </div>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-6 w-6 opacity-50 group-hover:opacity-100 text-muted-foreground hover:text-custom-status-error dark:hover:text-custom-status-error"
-                        onClick={() => dismissNotification(notif.id)}
-                        aria-label="Dismiss notification"
-                      >
-                        <FontAwesomeIcon icon={faTimes} className="h-3.5 w-3.5" />
-                      </Button>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <p className="p-6 text-sm text-muted-foreground text-center">
-                  ✨ All clear! No new notifications right now.
-                </p>
-              )}
-            </div>
-            {notifications.length > 0 && (
-              <div className="p-2 border-t dark:border-dark-border text-center">
-                <Link href="#" className="text-sm text-primary hover:underline">
-                  View all notifications
-                </Link>
-              </div>
-            )}
-          </PopoverContent>
-        </Popover>
         <Link href="/account-settings" passHref legacyBehavior>
           <Button
             variant="ghost"
