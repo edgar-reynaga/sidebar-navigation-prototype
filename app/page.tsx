@@ -164,7 +164,7 @@ export default function HomePage() {
 
           {/* Integration Banner */}
           {showIntegrationBanner && (
-            <div className="mb-8 bg-gradient-to-t from-[#E3ECF2] to-[#F5F8FA] dark:from-[#243B4C] dark:to-[#315067] border border-[#BDD1E0] dark:border-[#315067] rounded-lg p-6 relative">
+            <div className="mb-8 bg-gradient-to-b from-[#E3ECF2] to-[#FCFDFD] dark:from-[#243B4C] dark:to-[#315067] border border-[#BDD1E0] dark:border-[#315067] rounded-lg p-6 relative">
               <Button
                 variant="ghost"
                 size="icon"
@@ -206,8 +206,8 @@ export default function HomePage() {
                     significantly boost your fundraising.
                   </p>
                   <div className="flex">
-                    <Button variant="outline" size="sm" className="dark:border-slate-600 dark:text-slate-300">
-                      View All Integrations
+                    <Button variant="link" asChild className="p-0 h-auto text-[#393937] dark:text-[#F7F7F7]">
+                      <a href="">View All Integrations &rarr;</a>
                     </Button>
                   </div>
                 </div>

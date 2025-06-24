@@ -29,7 +29,8 @@ import {
   faEnvelope,
   faPenToSquare,
   faFileInvoiceDollar,
-  faPersonToPortal
+  faPersonToPortal,
+  faGavel,
 } from "@fortawesome/pro-solid-svg-icons"
 import { faGoogle, faStripeS, faVimeoV } from "@fortawesome/free-brands-svg-icons"
 import { faCircleStop, faWrench } from "@fortawesome/free-solid-svg-icons"
@@ -84,18 +85,19 @@ const NavItem: React.FC<NavItemProps> = ({ href, icon, label, isCollapsed }) => 
   return linkContent
 }
 
-const pagesItems = [
-  { href: "/", icon: faGrid2, label: "Dashboard", active: true },
+
+// Updated navigation structure
+const primaryNavItems = [
+  { href: "/", icon: faGrid2, label: "Dashboard" },
   { href: "/reporting", icon: faChartSimple, label: "Reporting" },
-  { href: "#", icon: faMobileNotch, label: "Forms" },
-  { href: "#", icon: faFileAlt, label: "Templates" },
-  { href: "#", icon: faUserGroup, label: "Team Fundraising" },
+  { href: "/forms", icon: faMobileNotch, label: "Forms" },
+  { href: "/projects", icon: faRectangleHistory, label: "Projects" },
+  { href: "/templates", icon: faFileAlt, label: "Templates" },
 ]
 
-const projectItems = [
-  { href: "#", icon: faRectangleHistory, label: "Active Projects" },
-  { href: "#", icon: faMemo, label: "Project Documents" },
-  { href: "#", icon: faWrench, label: "Project Settings" },
+const secondaryNavItems = [
+  { href: "#", icon: faUserGroup, label: "Team Fundraising" },
+  { href: "#", icon: faGavel, label: "Auctions" },
 ]
 
 const managerItems = [
@@ -115,6 +117,7 @@ const integrationItemsData = [
   { href: "#", icon: faGoogle, label: "Google" },
   { href: "#", icon: faCircleStop, label: "Twilio" },
   { href: "#", icon: faQrcode, label: "QR Code" },
+  // Border will be added before these last two items
   { href: "#", icon: faCircleStop, label: "Brightcove Gallery" },
   { href: "#", icon: faCircleStop, label: "Brightcove Beacon" },
   { href: "#", icon: faVimeoV, label: "Vimeo" }
@@ -161,8 +164,16 @@ export default function Sidebar() {
         </AccordionTrigger>
         <AccordionContent className="pt-1">
           <nav className="space-y-1">
-            {integrationItemsData.map((item) => (
-              <NavItem key={item.label} {...item} isCollapsed={false} />
+            {integrationItemsData.map((item, index) => (
+              <div key={item.label}>
+                {/* Add border before the last two items */}
+                {index === integrationItemsData.length - 3 && (
+                  <div className="my-2">
+                    <hr className="border-slate-200 dark:border-dark-border/50 mx-3" />
+                  </div>
+                )}
+                <NavItem {...item} isCollapsed={false} />
+              </div>
             ))}
           </nav>
         </AccordionContent>
@@ -172,9 +183,7 @@ export default function Sidebar() {
 
   const hasOpenSections = openSections.some(
     (sec) =>
-      (sec === "projects" && projectItems.length > 0) ||
-      (sec === "managers" && managerItems.length > 0) ||
-      (sec === "integrations" && integrationItemsData.length > 0),
+      (sec === "managers" && managerItems.length > 0) || (sec === "integrations" && integrationItemsData.length > 0),
   )
 
   return (
@@ -202,8 +211,18 @@ export default function Sidebar() {
           {isCollapsed ? (
             // Collapsed View: Render icons directly
             <div className="space-y-0.5 p-4 pt-8">
-              {/* Always Visible Pages Items */}
-              {pagesItems.map((item) => (
+              {/* Primary Navigation Items */}
+              {primaryNavItems.map((item) => (
+                <NavItem key={`collapsed-${item.label}`} {...item} isCollapsed={true} />
+              ))}
+
+              {/* Separator */}
+              <div className="py-1.5">
+                <hr className="border-slate-200 dark:border-dark-border/50 mx-2" />
+              </div>
+
+              {/* Secondary Navigation Items */}
+              {secondaryNavItems.map((item) => (
                 <NavItem key={`collapsed-${item.label}`} {...item} isCollapsed={true} />
               ))}
 
@@ -213,19 +232,6 @@ export default function Sidebar() {
                   <hr className="border-slate-200 dark:border-dark-border/50 mx-2" />
                 </div>
               )}
-
-              {/* Projects Section Icons (If Open) */}
-              {openSections.includes("projects") &&
-                projectItems.map((item) => <NavItem key={`collapsed-${item.label}`} {...item} isCollapsed={true} />)}
-
-              {/* Separator if Projects icons are shown and other open sections follow */}
-              {openSections.includes("projects") &&
-                projectItems.length > 0 &&
-                (openSections.includes("managers") || openSections.includes("integrations")) && (
-                  <div className="py-1.5">
-                    <hr className="border-slate-200 dark:border-dark-border/50 mx-2" />
-                  </div>
-                )}
 
               {/* Managers Section Icons (If Open) */}
               {openSections.includes("managers") &&
@@ -249,9 +255,21 @@ export default function Sidebar() {
           ) : (
             // Expanded View: Always visible pages + Accordion for other sections
             <div className="p-4 pt-8 space-y-1">
-              {/* Always Visible Pages Navigation */}
-              <nav className="space-y-1 mb-4">
-                {pagesItems.map((item) => (
+              {/* Primary Navigation Items */}
+              <nav className="space-y-1 mb-2">
+                {primaryNavItems.map((item) => (
+                  <NavItem key={item.label} {...item} isCollapsed={false} />
+                ))}
+              </nav>
+
+              {/* Separator */}
+              <div className="py-2 m-0">
+                <hr className="border-slate-200 dark:border-dark-border/50" />
+              </div>
+
+              {/* Secondary Navigation Items */}
+              <nav className="space-y-1 pb-4 mb-4">
+                {secondaryNavItems.map((item) => (
                   <NavItem key={item.label} {...item} isCollapsed={false} />
                 ))}
               </nav>
@@ -263,7 +281,6 @@ export default function Sidebar() {
                 value={openSections}
                 onValueChange={setOpenSections}
               >
-                {renderAccordionSection("Projects", "projects", projectItems)}
                 {renderAccordionSection("Managers", "managers", managerItems)}
                 {renderAccordionIntegrationsSection()}
               </Accordion>

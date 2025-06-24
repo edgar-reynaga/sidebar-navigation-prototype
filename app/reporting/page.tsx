@@ -232,7 +232,7 @@ export default function ReportingPage() {
             </Card>
           </div>
 
-                    {/* Filters Section */}
+        {/* Filters Section */}
           <Card className="border-0 shadow-none mb-8 dark:bg-dark-card-bg dark:border-slate-700">
             <CardContent className="p-0">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mt-6">
